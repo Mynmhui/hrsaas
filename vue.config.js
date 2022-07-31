@@ -28,6 +28,7 @@ module.exports = {
   outputDir: 'dist',
   assetsDir: 'static',
   lintOnSave: process.env.NODE_ENV === 'development',
+  lintOnSave: false,// 终端格式化报错时设置
   productionSourceMap: false,
   devServer: {
     port: port,

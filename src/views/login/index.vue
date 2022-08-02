@@ -49,12 +49,12 @@
         type="primary"
         style="width: 100%; margin-bottom: 30px"
         class="loginBtn"
-        :loading =  "isload"
+        :loading = "isload"
         @click="login"
       >登录</el-button>
 
       <div class="tips">
-        <span style="margin-right: 20px">账号: 13800000002</span>
+        <span style="margin-right: 20px">账号: 13800000004</span>
         <span> 密码: 123456</span>
       </div>
     </el-form>
@@ -68,7 +68,7 @@ export default {
   data() {
     return {
       loginForm: {
-        mobile: '13800000002',
+        mobile: '13800000004',
         password: '123456'
       },
       loginFormRules: {

@@ -1,5 +1,5 @@
 import router from '@/router'
-import store from './store'
+import store from '@/store'
 // 路由（全局）前置守卫
 // 会在所有路由进入之前触发
 // to: 去哪里的路由信息
@@ -9,6 +9,9 @@ const whiteList = ['/login', '/404']
 router.beforeEach((to, from, next) => {
     const token = store.state.user.token
     if (token) {
+    if (!store.state.user.userInfo.userId) {
+        store.dispatch('user/getUserInfo')
+    }
 // 1.登录
 // 是否进入登录页
 if (to.path === '/login') {

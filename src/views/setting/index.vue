@@ -15,9 +15,17 @@
             <el-table-column prop="description" label="描述" width="180">
             </el-table-column>
             <el-table-column prop="address" label="操作">
-              <el-button size="small" type="primary">分配权限</el-button>
-              <el-button size="small" type="success">编辑</el-button>
-              <el-button size="small" type="danger">删除</el-button>
+              <!-- 作用域插槽 -->
+              <template slot-scope="{ row }">
+                <el-button size="small" type="success">分配权限</el-button>
+                <el-button size="small" type="primary">编辑</el-button>
+                <el-button
+                  size="small"
+                  type="danger"
+                  @click="deleteRole(row.id)"
+                  >删除</el-button
+                >
+              </template>
             </el-table-column>
           </el-table>
           <el-pagination
@@ -39,16 +47,25 @@
           />
           <el-form label-width="120px" style="margin-top: 50px">
             <el-form-item label="公司名称">
-              <el-input disabled style="width: 400px" />
+              <el-input v-model="formData.name" disabled style="width: 400px" />
             </el-form-item>
             <el-form-item label="公司地址">
-              <el-input disabled style="width: 400px" />
+              <el-input
+                v-model="formData.companyAddress"
+                disabled
+                style="width: 400px"
+              />
             </el-form-item>
             <el-form-item label="邮箱">
-              <el-input disabled style="width: 400px" />
+              <el-input
+                v-model="formData.mailbox"
+                disabled
+                style="width: 400px"
+              />
             </el-form-item>
             <el-form-item label="备注">
               <el-input
+                v-model="formData.remarks"
                 type="textarea"
                 :rows="3"
                 disabled
@@ -83,7 +100,8 @@
 </template>
 
 <script>
-import { getRolesApi, addRoleApi } from '@/api/role'
+import { getRolesApi, addRoleApi, deleteRoleApi } from '@/api/role'
+import { getCompanyInfoApi } from '@/api/setting'
 export default {
   data() {
     return {
@@ -100,11 +118,12 @@ export default {
       addRouleFormRules: {
         name: [{ required: true, message: '请输角色名称', trigget: 'blur' }],
       },
+      formData: {},
     }
   },
 
   created() {
-    this.getRoles()
+    this.getRoles(), this.getCompanyInfo()
   },
 
   methods: {
@@ -135,8 +154,24 @@ export default {
       this.addRouleForm.name = ''
       this.addRouleForm.region = ''
     },
+    async deleteRole(id) {
+      //  提示
+      try {
+        await this.$confirm('确认删除该角色吗')
+        // 只有点击了确定 才能进入到下方
+        await deleteRoleApi(id) // 调用删除接口
+        this.getRoles() // 重新加载数据
+        this.$message.success('删除角色成功')
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    async getCompanyInfo() {
+      this.formData = await getCompanyInfoApi(
+        this.$store.state.user.userInfo.companyId,
+      )
+    },
   },
-  dialogClose() {},
 }
 </script>
 

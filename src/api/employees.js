@@ -9,3 +9,16 @@ export function getEmployeesApi() {
     url: '/sys/user/simple'
 })
 }
+
+/**
+ * 获取员工列表
+ * @param {*} params page页码 size条数
+ * @returns 
+ */
+export function getEmployeesInfoApi(params) {
+    return request({
+    url: '/sys/user',
+    params
+    })
+}
+

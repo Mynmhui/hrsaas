@@ -15,6 +15,10 @@ import router from './router'
 import '@/icons' // icon
 import '@/permission' // permission control
 import * as directives from '@/directives'
+import components from '@/components/index'
+
+Vue.use(components)
+
 
 /**
  * If you don't want to use mock-server

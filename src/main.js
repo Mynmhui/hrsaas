@@ -14,11 +14,22 @@ import router from './router'
 
 import '@/icons' // icon
 import '@/permission' // permission control
+//自定义指令
 import * as directives from '@/directives'
+// 组件
 import components from '@/components/index'
-
+// 过滤器封装
+import * as filter from '@/filter'
+//统一注测过滤器
+for (let key in filter) {
+  Vue.filter(key, filter[key])
+}
+//统一注册组件
 Vue.use(components)
-
+//统一注册自定义指令
+for (let key in directives) {
+  Vue.directive(key, directives[key])
+}
 
 /**
  * If you don't want to use mock-server
@@ -42,10 +53,6 @@ Vue.use(ElementUI, { locale })
 // test：测试
 // pro：production 生产
 Vue.config.productionTip = false
-
-for (let key in directives) {
-  Vue.directive(key, directives[key])
-}
 
 new Vue({
   el: '#app',

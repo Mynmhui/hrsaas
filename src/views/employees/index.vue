@@ -4,8 +4,15 @@
       <page-tools>
         <span slot="left-tag">共166条记录</span>
         <template slot="right">
-          <el-button size="small" type="warning" @click="$router.push('/import')">导入</el-button>
-          <el-button size="small" type="danger">导出</el-button>
+          <el-button
+            size="small"
+            type="warning"
+            @click="$router.push('/import')"
+            >导入</el-button
+          >
+          <el-button size="small" type="danger" @click="exportExcel"
+            >导出</el-button
+          >
           <el-button size="small" type="primary" @click="showAdd"
             >新增员工</el-button
           >
@@ -95,6 +102,7 @@
 import { getEmployeesInfoApi, delEmployee } from '@/api/employees'
 import employees from '@/constant/employees.js'
 import AddEmployees from './components/add-employees.vue'
+const { hireType, exportExcelMapPath } = employees
 export default {
   name: 'Employees',
   components: {
@@ -139,6 +147,39 @@ export default {
     },
     showAdd() {
       this.showAddEmployees = true
+    },
+    async exportExcel() {
+      const { export_json_to_excel } = await import('@/vendor/Export2Excel')
+      const { rows } = await getEmployeesInfoApi({
+        page: 1,
+        size: this.total,
+      })
+      //表头数据['手机号'，‘姓名’，...]
+      const header = Object.keys(exportExcelMapPath)
+      // data数据
+      const data = rows.map((item) => {
+        return header.map((h) => {
+        if (h === '聘用形式') {
+        const findItem = hireType.find((hire) => {
+          return hire.id === item[exportExcelMapPath[h]]
+        })
+        return findItem ? findItem.value : '未知'
+        } else {
+        return item[exportExcelMapPath[h]]
+        }
+        })
+      })
+      console.log(data)
+      export_json_to_excel({
+        header, // 表头
+        data, //具体数据
+        filename: '员工列表',
+        autoWidth: true,
+        bookType: 'xlsx',
+        //复杂表头
+        // multiHeader: [[]],  表头
+        // merges: []， 合并
+      })
     },
   },
 }

@@ -20,6 +20,9 @@ import * as directives from '@/directives'
 import components from '@/components/index'
 // 过滤器封装
 import * as filter from '@/filter'
+
+import Print from 'vue-print-nb'
+Vue.use(Print)
 //统一注测过滤器
 for (let key in filter) {
   Vue.filter(key, filter[key])

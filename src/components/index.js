@@ -1,6 +1,7 @@
 import PageTools from '@/components/PageTools'
 import UploadExcle from '@/components/upload-excle'
-const components = [PageTools, UploadExcle]
+import UploadImg from '@/components/UploadImg'
+const components = [PageTools, UploadExcle, UploadImg]
 export default {
     install(Vue) {
     components.forEach((component)=> {

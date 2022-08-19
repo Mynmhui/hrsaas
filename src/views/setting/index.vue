@@ -17,7 +17,7 @@
             <el-table-column prop="address" label="操作">
               <!-- 作用域插槽 -->
               <template slot-scope="{ row }">
-                <el-button size="small" type="success">分配权限</el-button>
+                <el-button size="small" type="success" @click="showRigthsDialog">分配权限</el-button>
                 <el-button size="small" type="primary">编辑</el-button>
                 <el-button
                   size="small"
@@ -96,12 +96,36 @@
         <el-button type="primary" @click="onAddRule">确 定</el-button>
       </span>
     </el-dialog>
+
+    <!-- 给角色分配权限 -->
+    <el-dialog
+      title="给角色分配权限"
+      :visible.sync="setRightsDialog"
+      width="50%"
+    >
+      <el-tree 
+      default-expand-all
+      show-checkbox
+      node-key
+      :data="permissions"
+      :default-checked-keys="defaultCheckKeys"
+      :props="{ label: 'name' }"
+      ></el-tree>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="setRightsDialog = false">取 消</el-button>
+        <el-button type="primary"
+          >确 定</el-button
+        >
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { getRolesApi, addRoleApi, deleteRoleApi } from '@/api/role'
 import { getCompanyInfoApi } from '@/api/setting'
+import { getPermissionList } from '@/api/permission'
+import { transListToTree } from '@/utils'
 export default {
   data() {
     return {
@@ -112,18 +136,23 @@ export default {
       page: 1,
       adddialogVisible: false,
       addRouleForm: {
-        name: '',
+        name: '',  // 部门名称
         region: '',
       },
       addRouleFormRules: {
         name: [{ required: true, message: '请输角色名称', trigget: 'blur' }],
       },
       formData: {},
+      setRightsDialog: false,
+      permissions: [],  // 权限树形数据
+      defaultCheckKeys: ['1', '1063315016368918528'] ,  //分配权限选中项
     }
   },
 
   created() {
-    this.getRoles(), this.getCompanyInfo()
+    this.getRoles(), 
+    this.getCompanyInfo(),
+    this.getPermissionList()
   },
 
   methods: {
@@ -171,6 +200,17 @@ export default {
         this.$store.state.user.userInfo.companyId,
       )
     },
+    //点击分配权限显示对话框
+    showRigthsDialog() {
+    this.setRightsDialog = true
+    },
+    //获取权限列表
+    async getPermissionList() {
+    const res = await getPermissionList()
+    const treePermission = transListToTree(res, '0')
+    console.log(treePermission);
+    this.permissions = treePermission
+    }
   },
 }
 </script>

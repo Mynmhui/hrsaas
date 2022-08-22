@@ -3,7 +3,10 @@
     <div class="app-container">
       <el-tabs v-model="activeName">
         <el-tab-pane label="角色管理" name="first">
-          <el-button type="primary" @click="adddialogVisible = true"
+          <el-button
+            type="primary"
+            @click="adddialogVisible = true"
+            v-if="isHas(point.roles.add)"
             >新增角色</el-button
           >
           <!-- 表格 -->
@@ -17,7 +20,12 @@
             <el-table-column prop="address" label="操作">
               <!-- 作用域插槽 -->
               <template slot-scope="{ row }">
-                <el-button size="small" type="success" @click="showRigthsDialog">分配权限</el-button>
+                <el-button
+                  size="small"
+                  type="success"
+                  @click="showRigthsDialog(row.id)"
+                  >分配权限</el-button
+                >
                 <el-button size="small" type="primary">编辑</el-button>
                 <el-button
                   size="small"
@@ -102,31 +110,40 @@
       title="给角色分配权限"
       :visible.sync="setRightsDialog"
       width="50%"
+      destroy-on-close
+      @click="setRightsClose"
     >
-      <el-tree 
-      default-expand-all
-      show-checkbox
-      node-key
-      :data="permissions"
-      :default-checked-keys="defaultCheckKeys"
-      :props="{ label: 'name' }"
+      <el-tree
+        ref="perTree"
+        default-expand-all
+        show-checkbox
+        node-key="id"
+        :data="permissions"
+        :default-checked-keys="defaultCheckKeys"
+        :props="{ label: 'name' }"
       ></el-tree>
       <span slot="footer" class="dialog-footer">
         <el-button @click="setRightsDialog = false">取 消</el-button>
-        <el-button type="primary"
-          >确 定</el-button
-        >
+        <el-button type="primary" @click="onSaveRights">确 定</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { getRolesApi, addRoleApi, deleteRoleApi } from '@/api/role'
+import {
+  getRolesApi,
+  addRoleApi,
+  deleteRoleApi,
+  getRolesInfo,
+  assignPerm,
+} from '@/api/role'
 import { getCompanyInfoApi } from '@/api/setting'
 import { getPermissionList } from '@/api/permission'
 import { transListToTree } from '@/utils'
+import MixinPermission from '@/mixins/permissionPoint'
 export default {
+  mixins: [MixinPermission],
   data() {
     return {
       activeName: 'first',
@@ -136,7 +153,7 @@ export default {
       page: 1,
       adddialogVisible: false,
       addRouleForm: {
-        name: '',  // 部门名称
+        name: '', // 部门名称
         region: '',
       },
       addRouleFormRules: {
@@ -144,15 +161,15 @@ export default {
       },
       formData: {},
       setRightsDialog: false,
-      permissions: [],  // 权限树形数据
-      defaultCheckKeys: ['1', '1063315016368918528'] ,  //分配权限选中项
+      permissions: [], // 权限树形数据
+      defaultCheckKeys: [], //分配权限选中项
+      roleId: '',
+      // point: permissionPoint,
     }
   },
 
   created() {
-    this.getRoles(), 
-    this.getCompanyInfo(),
-    this.getPermissionList()
+    this.getRoles(), this.getCompanyInfo(), this.getPermissionList()
   },
 
   methods: {
@@ -199,18 +216,39 @@ export default {
       this.formData = await getCompanyInfoApi(
         this.$store.state.user.userInfo.companyId,
       )
+      this.companyInfo = this.formData
     },
     //点击分配权限显示对话框
-    showRigthsDialog() {
-    this.setRightsDialog = true
+    async showRigthsDialog(id) {
+      this.roleId = id
+      this.setRightsDialog = true
+      const res = await getRolesInfo(id)
+      this.defaultCheckKeys = res.permIds
     },
     //获取权限列表
     async getPermissionList() {
-    const res = await getPermissionList()
-    const treePermission = transListToTree(res, '0')
-    console.log(treePermission);
-    this.permissions = treePermission
-    }
+      const res = await getPermissionList()
+      const treePermission = transListToTree(res, '0')
+      console.log(treePermission)
+      this.permissions = treePermission
+    },
+    //监听设置权限对话框关闭
+    setRightsClose() {
+      this.defaultCheckKeys = []
+    },
+    //保存权限分配
+    async onSaveRights() {
+      await assignPerm({
+        id: this.roleId,
+        permIds: this.$refs.perTree.getCheckedKeys(),
+      })
+      this.$message.success('分配成功')
+      this.setRightsDialog = false
+    },
+    // // 控制按钮权限
+    // isHas(point) {
+    //   return this.$store.state.permission.points.includes(point)
+    // },
   },
 }
 </script>

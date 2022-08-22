@@ -6,6 +6,9 @@ export default {
   component: Layout,
   hidden: true,
   name: 'user',
+  meta: {
+  id: 'users'
+  },
   children: [
     {
       path: '/users/approvals',

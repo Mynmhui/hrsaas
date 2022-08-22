@@ -1,6 +1,7 @@
-import router from '@/router'
+import router, { asyncRoutes } from '@/router'
 import store from '@/store'
-// 路由（全局）前置守卫
+import { Store } from 'vuex'
+// 1路由（全局）前置守卫 · 2路由（全局）后置守卫 · 3路由独享守卫 · 4组件内守卫
 // 会在所有路由进入之前触发
 // to: 去哪里的路由信息
 // from: 来自哪个路由的信息
@@ -10,7 +11,11 @@ router.beforeEach(async (to, from, next) => {
     const token = store.state.user.token
     if (token) {
     if (!store.state.user.userInfo.userId) {
-        await store.dispatch('user/getUserInfo')
+    //获取用户信息 store.dispatch的返回值是promise
+    const { roles } = await store.dispatch('user/getUserInfo')
+    await store.dispatch('permission/filterRoutes', roles)
+  //await Store.dispatch('permission/setPointsAction', roles.points)
+    next(to.path)
     }
 // 1.登录
 // 是否进入登录页

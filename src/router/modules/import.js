@@ -3,6 +3,9 @@ export default {
   path: '/import',
   component: Layout,
   hidden: true,
+    meta: {
+  id: 'import'//用来和后端做约定的
+  },
   children: [
     {
       path: '',

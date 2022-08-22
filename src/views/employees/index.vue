@@ -8,12 +8,17 @@
             size="small"
             type="warning"
             @click="$router.push('/import')"
+            v-isHas="point.employees.import"
             >导入</el-button
           >
           <el-button size="small" type="danger" @click="exportExcel"
             >导出</el-button
           >
-          <el-button size="small" type="primary" @click="showAdd"
+          <el-button
+            size="small"
+            type="primary"
+            @click="showAdd"
+            v-if="isHas(point.employees.add)"
             >新增员工</el-button
           >
         </template>
@@ -65,12 +70,26 @@
           </el-table-column>
           <el-table-column label="操作" sortable="" fixed="right" width="280">
             <template slot-scope="{ row }">
-              <el-button type="text" size="small" @click="$router.push('/employees/detail/' + row.id)">查看</el-button>
+              <el-button
+                type="text"
+                size="small"
+                @click="$router.push('/employees/detail/' + row.id)"
+                >查看</el-button
+              >
               <el-button type="text" size="small">转正</el-button>
               <el-button type="text" size="small">调岗</el-button>
               <el-button type="text" size="small">离职</el-button>
-              <el-button type="text" size="small" @click="showAssignDialog(row.id)">角色</el-button>
-              <el-button type="text" size="small" @click="onRemove(row.id)"
+              <el-button
+                type="text"
+                size="small"
+                @click="showAssignDialog(row.id)"
+                >角色</el-button
+              >
+              <el-button
+                type="text"
+                size="small"
+                @click="onRemove(row.id)"
+                v-if="isHas(point.employees.del)"
                 >删除</el-button
               >
             </template>
@@ -102,7 +121,10 @@
     </el-dialog>
 
     <!-- 角色弹层 -->
-    <AssignRole :employeesId="currentEmployeesId" :visible.sync="showAssignRole"></AssignRole>
+    <AssignRole
+      :employeesId="currentEmployeesId"
+      :visible.sync="showAssignRole"
+    ></AssignRole>
   </div>
 </template>
 
@@ -112,12 +134,15 @@ import employees from '@/constant/employees.js'
 import AddEmployees from './components/add-employees.vue'
 import AssignRole from './components/assign-role.vue'
 import QRcode from 'qrcode'
+// import permissionPoint from '@/constant/permission' //按钮映射表
+import MixinPermission from '@/mixins/permissionPoint'
 const { hireType, exportExcelMapPath } = employees
 export default {
   name: 'Employees',
+  mixins: [MixinPermission],
   components: {
     AddEmployees,
-    AssignRole
+    AssignRole,
   },
   data() {
     return {
@@ -130,7 +155,8 @@ export default {
       showAddEmployees: false,
       ercodeDialog: false,
       showAssignRole: false,
-      currentEmployeesId: ''
+      currentEmployeesId: '',
+      // point: permissionPoint,
     }
   },
 
@@ -173,14 +199,14 @@ export default {
       // data数据
       const data = rows.map((item) => {
         return header.map((h) => {
-        if (h === '聘用形式') {
-        const findItem = hireType.find((hire) => {
-          return hire.id === item[exportExcelMapPath[h]]
-        })
-        return findItem ? findItem.value : '未知'
-        } else {
-        return item[exportExcelMapPath[h]]
-        }
+          if (h === '聘用形式') {
+            const findItem = hireType.find((hire) => {
+              return hire.id === item[exportExcelMapPath[h]]
+            })
+            return findItem ? findItem.value : '未知'
+          } else {
+            return item[exportExcelMapPath[h]]
+          }
         })
       })
       console.log(data)
@@ -196,18 +222,22 @@ export default {
       })
     },
     showErCodeDialog(staffPhoto) {
-    if (!staffPhoto) return this.$message.error('该用户还没有设置头像')
-    this.ercodeDialog = true
-    this.$nextTick(() => {
-    const canvas = document.getElementById('canvas')
-    QRcode.toCanvas(canvas, staffPhoto)
-    })
+      if (!staffPhoto) return this.$message.error('该用户还没有设置头像')
+      this.ercodeDialog = true
+      this.$nextTick(() => {
+        const canvas = document.getElementById('canvas')
+        QRcode.toCanvas(canvas, staffPhoto)
+      })
     },
     //点击橘色显示角色弹层
     showAssignDialog(id) {
-    this.showAssignRole = true
-    this.currentEmployeesId = id
-    }
+      this.showAssignRole = true
+      this.currentEmployeesId = id
+    },
+    // 控制按钮权限
+    // isHas(point) {
+    //   return this.$store.state.permission.points.includes(point)
+    // },
   },
 }
 </script>

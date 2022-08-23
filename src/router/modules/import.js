@@ -3,14 +3,15 @@ export default {
   path: '/import',
   component: Layout,
   hidden: true,
-    meta: {
-  id: 'import'//用来和后端做约定的
+  meta: {
+    id: 'import', // 用来和后端权限做约定的
   },
   children: [
     {
       path: '',
+      name: 'import',
       component: () => import('@/views/import'),
-      meta: { title: '权限管理', icon: 'lock' }
-    }
-  ]
+      meta: { title: '员工', icon: 'people' },
+    },
+  ],
 }

@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard-container" id="myPrint">
-    <!-- v-print的值应该是一个字符串（选择器），对应的就会将选择器中的内容进行打印 -->
+    <!-- v-print的值应该是一个字符串(选择器), 对应的就会将该选择器中的内容进行打印 -->
     <el-button v-print="'#myPrint'">打印</el-button>
     <div class="app-container">
       <el-card>

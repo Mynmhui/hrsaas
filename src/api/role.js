@@ -2,33 +2,34 @@ import request from '@/utils/request'
 
 /**
  * 获取角色列表
- * @param {*} params 
- * @returns 
  */
 export function getRolesApi(params) {
-    return request({
+  return request({
     url: '/sys/role',
-    params
-    })
+    params,
+  })
 }
 
+/**
+ * 添加角色
+ * @param {*} data {name, region}
+ */
 export function addRoleApi(data) {
-    return request({
-    
+  return request({
     url: '/sys/role',
     method: 'POST',
-    data
-})
+    data,
+  })
 }
 
-/** **
- *  删除角色
- *
- * ****/
-export function deleteRoleApi(id) {
+/**
+ * 通过角色id实现删除
+ * @param {*} id 角色id
+ */
+export function removeRoleApi(id) {
   return request({
-    url: `/sys/role/${id}`,
-    method: 'delete'
+    url: '/sys/role/' + id,
+    method: 'DELETE',
   })
 }
 
@@ -39,7 +40,7 @@ export function deleteRoleApi(id) {
  */
 export function getRolesInfo(id) {
   return request({
-  url: '/sys/role/' + id
+    url: '/sys/role/' + id,
   })
 }
 
@@ -52,6 +53,6 @@ export function assignPerm(data) {
   return request({
     url: '/sys/role/assignPrem',
     method: 'put',
-    data
+    data,
   })
 }

@@ -28,13 +28,13 @@
           style="width: 50%"
           placeholder="请选择"
         >
-        <el-option 
-        v-for="item in hireType"
-        :key="item.id"
-        :label="item.value"
-        :value="item.id"
-        >
-        </el-option>
+          <el-option
+            v-for="item in hireType"
+            :key="item.id"
+            :label="item.value"
+            :value="item.id"
+          >
+          </el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="工号" prop="workNumber">
@@ -50,17 +50,19 @@
           style="width: 50%"
           placeholder="请选择部门"
         /> -->
-        <el-select 
-        ref="deptSelect"
-        @focus="getDepts"
-        v-model="formData.departmentName" 
-        placeholder="请选择部门">
-            <el-option value="" v-loading="isTreeLoading" class="treeOption">
-                <el-tree 
-                @node-click="treeNodeClick"
-                :data="depts" 
-                :props="treeProps"></el-tree>
-            </el-option>
+        <el-select
+          @focus="getDepts"
+          v-model="formData.departmentName"
+          placeholder="请选择部门"
+          ref="deptSelect"
+        >
+          <el-option class="treeOption" v-loading="isTreeLoading" value="">
+            <el-tree
+              @node-click="treeNodeClick"
+              :data="depts"
+              :props="treeProps"
+            ></el-tree>
+          </el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="转正时间" prop="correctionTime">
@@ -72,7 +74,7 @@
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
-      <el-button @click="$emit('update:visible', false)">取 消</el-button>
+      <el-button @click="onClose">取 消</el-button>
       <el-button @click="onSave" type="primary">确 定</el-button>
     </span>
   </el-dialog>
@@ -81,8 +83,8 @@
 <script>
 import employees from '@/constant/employees'
 import { getDeptsApi } from '@/api/departments'
-import { addEmployee } from '@/api/employees'
 import { transListToTree } from '@/utils'
+import { addEmployee } from '@/api/employees'
 const { hireType } = employees
 export default {
   data() {
@@ -120,16 +122,18 @@ export default {
           { required: true, message: '工号不能为空', trigger: 'blur' },
         ],
         departmentName: [
-          { required: true, message: '部门不能为空', trigger: 'change' },
+          { required: true, message: '部门不能为空', trigger: 'blur' },
         ],
-        timeOfEntry: [{ required: true, message: '入职时间', trigger: 'blur' }],
+        timeOfEntry: [
+          { required: true, message: '入职时间', trigger: 'change' },
+        ],
       },
       hireType,
-      depts:[],
+      depts: [],
       treeProps: {
-      label: 'name'
+        label: 'name',
       },
-      isTreeLoading: false
+      isTreeLoading: false,
     }
   },
 
@@ -148,35 +152,38 @@ export default {
       this.$refs.form.resetFields()
     },
     async getDepts() {
-    this.isTreeLoading = true
-    const { depts } = await getDeptsApi()
-    this.depts = transListToTree(depts, '')
-    this.isTreeLoading = false
+      this.isTreeLoading = true
+      const { depts } = await getDeptsApi()
+      transListToTree(depts, '')
+      this.depts = depts
+      this.isTreeLoading = false
     },
     treeNodeClick(row) {
-    this.formData.departmentName = row.name
-    this.$refs.deptSelect.blur()
+      // console.log(row)
+      this.formData.departmentName = row.name
+      this.$refs.deptSelect.blur()
     },
     onSave() {
-    this.$refs.form.validate(async (valid) => {
-    if (!valid) return
-    await addEmployee(this.formData)
-    this.$message.success('添加成功')
-    this.onClose()
-    this.$emit('add-success')
-    })
-    }
+      this.$refs.form.validate(async (valid) => {
+        if (!valid) return
+        await addEmployee(this.formData)
+        this.$message.success('添加成功')
+        this.onClose()
+        this.$emit('add-success')
+      })
+    },
   },
 }
 </script>
 
 <style scoped lang="scss">
-    .el-select-dropdown__item.hover,
-    .el-select-dropdown__item:hover .el-select-dropdown__item {
-    background-color: #fff;
-    overflow: unset
-    }
-    .treeOption {
-    height: 100px;
-    }
+.el-select-dropdown__item.hover,
+.el-select-dropdown__item:hover .el-select-dropdown__item {
+  background-color: #fff;
+  overflow: unset;
+}
+
+.treeOption {
+  height: 100px;
+}
 </style>

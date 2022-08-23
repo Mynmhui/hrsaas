@@ -8,14 +8,19 @@ export function getPermissionList() {
 }
 
 /**
- * 添加权限
- * @param {Object} data 
- * @returns  promise
+ * @params {Object} data 
+enVisible	string	非必须			
+name	string	非必须			
+code	string	非必须			
+description	string	非必须			
+type	number	非必须			
+pid
+ * @returns promise
  */
 export function addPermission(data) {
   return request({
-  url: '/sys/permission',
-  method: 'POST',
-  data
+    url: '/sys/permission',
+    method: 'POST',
+    data,
   })
 }
